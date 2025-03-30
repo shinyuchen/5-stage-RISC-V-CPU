@@ -1,0 +1,53 @@
+addi r1, r0, 3    // init n
+addi r3, r0, 1024 // init stack pointer
+addi r4, r0, 96   // x = finish
+fibonacci:
+    beq r1, r0, 68
+    addi r2, r0, 1
+    beq r1, r2, 68
+    addi r3, r3, -12       # Allocate stack space (3 words)
+    sw r4, r3, 8           # Save return address
+    sw r1, r3, 4           # Save original n
+    addi r1, r1, -1
+    jal r4, -28            # fib(n-1)
+    sw r1, r3, 0           # Store fib(n-1) result
+    lw r1, r3, 4           # Restore original n
+    addi r1, r1, -2
+    jal r4, -44            # fib(n-2)
+    lw r2, r3, 0           # Get fib(n-1) result
+    add r1, r1, r2         # r1 = fib(n-1) + fib(n-2)
+    lw r4, r3, 8           # Restore return address
+    addi r3, r3, 12        # Deallocate stack
+    jalr r0, r4, 0                    # Return to caller
+return_zero:
+    addi r1, r0, 0       # Return value 0
+    jalr r0, r4, 0
+return_one:
+    addi r1, r0, 1       # Return value 1
+    jalr r0, r4, 0
+
+
+addi r1, r0, 7
+addi r3, r0, 1024
+addi r4, r0, 96
+beq r1, r0, 68
+addi r2, r0, 1
+beq r1, r2, 68
+addi r3, r3, -12
+sw r4, r3, 8
+sw r1, r3, 4
+addi r1, r1, -1
+jal r4, -28
+sw r1, r3, 0
+lw r1, r3, 4
+addi r1, r1, -2
+jal r4, -44
+lw r2, r3, 0
+add r1, r1, r2
+lw r4, r3, 8
+addi r3, r3, 12
+jalr r0, r4, 0
+addi r1, r0, 0
+jalr r0, r4, 0
+addi r1, r0, 1
+jalr r0, r4, 0

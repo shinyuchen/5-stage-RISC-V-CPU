@@ -1,0 +1,54 @@
+bubble_sort:
+    # Prologue: Save preserved registers
+    addi sp, sp, -8
+    sw   s0, 4(sp)
+    sw   s1, 0(sp)
+
+    # Load array length and check for early exit
+    addi t0, a1, -1       # t0 = len-1
+    blt  t0, zero, end    # exit if len <= 1
+
+    # Outer loop initialization
+    addi s0, a1, -1       # i = len-1 (outer counter)
+outer_loop:
+    # Check outer loop condition
+    slti t1, s0, 1        # t1 = (i < 1)
+    bne  t1, zero, end    # exit if i < 1
+
+    # Inner loop initialization
+    addi s1, zero, 0      # j = 0 (inner counter)
+inner_loop:
+    # Check inner loop condition
+    slt  t1, s1, s0      # t1 = (j < i)
+    beq  t1, zero, next_outer
+
+    # Load elements
+    slli t2, s1, 2       # j * 4 (byte offset)
+    add  t3, a0, t2      # address of x[j]
+    lw   t4, 0(t3)       # x[j]
+    lw   t5, 4(t3)       # x[j+1]
+
+    # Compare and swap
+    slt  t6, t5, t4      # t6 = (x[j+1] < x[j])
+    beq  t6, zero, no_swap
+    sw   t5, 0(t3)       # swap x[j]
+    sw   t4, 4(t3)       # swap x[j+1]
+
+no_swap:
+    # Increment inner counter
+    addi s1, s1, 1       # j++
+    jal  zero, inner_loop
+
+next_outer:
+    # Decrement outer counter
+    addi s0, s0, -1      # i--
+    jal  zero, outer_loop
+
+end:
+    # Epilogue: Restore registers
+    lw   s0, 4(sp)
+    lw   s1, 0(sp)
+    addi sp, sp, 8
+    
+    # Return using base instruction
+    jalr zero, 0(ra)
